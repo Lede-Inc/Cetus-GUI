@@ -1,0 +1,48 @@
+[supervisord]
+logfile=logs/supervisord.log
+logfile_backups=1
+stopsignal=QUIT
+
+[supervisorctl]
+
+[inet_http_server]
+port = 127.0.0.1:9001
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[program:backend]
+directory=backend/
+command=uwsgi --ini uwsgi.cnf
+redirect_stderr=true
+stdout_logfile=logs/supervisor_backend.log
+
+[program:cetus]
+directory=backend/
+command=python manage.py celery worker -Q cetus -E -n cetus
+redirect_stderr=true
+stdout_logfile=logs/supervisor_cetus.log
+
+[program:monitor]
+directory=backend/
+command=python manage.py celery worker -Q cetus_monitor -n cetus_monitor
+redirect_stderr=true
+stdout_logfile=logs/supervisor_monitor.log
+
+[program:beat]
+directory=backend/
+command=python manage.py celery beat
+redirect_stderr=true
+stdout_logfile=logs/supervisor_beat.log
+
+[program:celerycam]
+directory=backend/
+command=python manage.py celerycam
+redirect_stderr=true
+stdout_logfile=logs/supervisor_celerycam.log
+
+[program:frontend]
+directory=frontend/
+command=npm run dev
+redirect_stderr=true
+stdout_logfile=logs/supervisor_frontend.log

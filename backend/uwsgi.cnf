@@ -1,0 +1,11 @@
+[uwsgi]
+
+http=0.0.0.0:8000
+wsgi-file=backend/wsgi.py
+static-map=/static=static
+processes=4
+threads=2
+
+close-on-exec
+vacuum=true
+master=true
