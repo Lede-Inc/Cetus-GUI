@@ -1,8 +1,8 @@
-## Cetus GUI
+## Cetus-GUI
 
 ---
 
-Cetus GUI是基于web端的Cetus集群可视化管理系统，能有效的提升部署与管理Cetus集群的效率。
+Cetus-GUI是基于web端的Cetus集群可视化管理系统，能有效的提升部署与管理Cetus集群的效率。
 
 **本项目当前仅适用于RedHat/CentOS系统在SaltStack环境下使用远程配置库安装配置多Cetus节点的需求。**
 
@@ -33,7 +33,7 @@ cd Cetus-GUI
 vi /etc/salt/master
 file_roots:
   base:
-    - $PROJECT_PATH/cetus_gui/backend/shells
+    - $PROJECT_PATH/Cetus-GUI/backend/shells
 
 # 修改Django配置文件
 vi backend/backend/settings.py

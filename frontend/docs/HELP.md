@@ -1,8 +1,8 @@
-# Cetus GUI 帮助文档
+# Cetus-GUI 帮助文档
 
 ---
 
-此文档主要是帮助您解决Cetus GUI安装和使用过程中可能会出现的问题。
+此文档主要是帮助您解决Cetus-GUI安装和使用过程中可能会出现的问题。
 
 目前项目处于测试阶段，希望您在使用时能积极向我们反馈bug和需求，我们将会很快的解决。
 
@@ -14,7 +14,7 @@
 
 #### 基础环境配置
 
-**所有与项目相关节点**确保有Python3环境，其中主节点需要有Python2环境以支持Supervisor。
+**所有与项目相关节点**确保有Python3环境，其中主节点兼容Python2环境以支持Supervisor。
 
 **所有节点**确保执行下列命令：
 
@@ -76,20 +76,20 @@
         
 * 非root用户启动
 
-    在启动salt时我们可以修改启动用户，与整个项目的部署用户保持一致。**这一步是我们用非root用户部署项目时，必须要做的。**
+    在启动salt时可以修改启动用户，与整个项目的部署用户保持一致。**这一步是我们用非root用户部署项目时，必须要做的。**
     
     ```
-      # vi /etc/salt/master
+      # sudo vi /etc/salt/master
           
       user: user
       
       # 修改权限
-      # chown -R user:user /etc/salt /var/cache/salt /var/log/salt /var/run/salt
+      # sudo chown -R user:user /etc/salt /var/cache/salt /var/log/salt /var/run/salt
       
       # sudo service salt-minion restart
     ```
     
-    Minion节点不需要修改，我们这样做可以使传递到Minion的命令仍为root执行。 
+    Minion节点不需要修改，这样可以使发送到Minion的命令仍为root执行。
         
 * 其他问题
 
