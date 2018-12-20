@@ -24,8 +24,8 @@ Cetus GUI是基于web端的Cetus集群可视化管理系统，能有效的提升
 
 ```
 
-git clone https://git.ms.netease.com/dbadmin/cetus_gui.git
-cd cetus_gui
+git clone https://github.com/Lede-Inc/Cetus-GUI
+cd Cetus-GUI
 
 修改如下配置：
 
