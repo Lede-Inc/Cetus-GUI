@@ -33,7 +33,7 @@
     Master节点：
     * 项目当前**必须**与Master节点位于同一个服务器
     * 安装流程
-        * sudo yum install https://repo.saltstack.com/yum/redhat/salt-repo-latest-2.el7.noarch.rpm 
+        * sudo yum install https://repo.saltstack.com/py3/redhat/salt-py3-repo-latest-2.el7.noarch.rpm
         * sudo yum clean expire-cache
         * sudo yum install salt-master
         * sudo yum install salt-minion
@@ -41,7 +41,7 @@
     Minion节点：
     * Master节点所在服务器也可以配置为Minion
     * 安装流程
-        * sudo yum install https://repo.saltstack.com/yum/redhat/salt-repo-latest-2.el7.noarch.rpm 
+        * sudo yum install https://repo.saltstack.com/py3/redhat/salt-py3-repo-latest-2.el7.noarch.rpm
         * sudo yum clean expire-cache
         * sudo yum install salt-minion
 
@@ -72,7 +72,7 @@
     ```
     
     * 启动
-        * sudo service salt-minion start
+        * sudo service salt-master start
         
 * 非root用户启动
 
