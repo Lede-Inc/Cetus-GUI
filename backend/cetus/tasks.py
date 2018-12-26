@@ -39,11 +39,11 @@ def install_cetus(**kwargs):
     try:
         for node in kwargs.get('nodes'):
             kwargs.update(salt_id=node.get('salt_id'))
-            kwargs.update(version=SaltClient.download_cetus_node(**kwargs))
+            kwargs.update(record_version=SaltClient.download_cetus_node(**kwargs))
 
-            kwargs.update(dir='{path}/cetus_{service_port}/{version}'.format(**kwargs))
+            kwargs.update(dir='{path}/cetus_{service_port}/{record_version}'.format(**kwargs))
             TbCetusNodeInfo.objects.filter(group_id=kwargs.get('id')) \
-                .update(version=kwargs.get('version'), dir=kwargs.get('dir'))
+                .update(version=kwargs.get('record_version'), dir=kwargs.get('dir'))
 
             SaltClient.install_cetus_node(**kwargs)
     except Exception as e:
