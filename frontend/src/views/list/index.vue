@@ -12,10 +12,9 @@
       </el-form-item>
       <el-form-item label="状态">
         <el-select v-model="listQuery.status" clearable size="small" placeholder="" @change="handleFilter">
-          <el-option label="运行中" value="0"/>
-          <el-option label="已关闭" value="-1"/>
-          <el-option label="创建中" value="1"/>
-          <el-option label="关闭中" value="-2"/>
+          <el-option label="运行中" value="运行中"/>
+          <el-option label="已关闭" value="已关闭"/>
+          <el-option label="部分运行" value="部分运行"/>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -134,15 +133,14 @@ export default {
         page: 1,
         limit: 10,
         cetus_name: undefined,
-        cetus_type: undefined
+        cetus_type: undefined,
+        status: undefined
       },
       listEdit: {
         id: undefined,
         cetus_name: undefined,
         config_db: undefined
       },
-      statusOptions: ['0', '-1', '1', '-2'],
-      typeOptions: ['rw', 'shard'],
       dialogChangeConfig: false,
       rules: {
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -159,7 +157,7 @@ export default {
       this.listLoading = true
       cetusList(this.listQuery).then(response => {
         this.list = response.data.results
-        this.list = this.list.map(v => {
+        this.list = this.list.filter(v => {
           let statusFlag = 0
           for (const item of v.nodes) {
             if (item.status === 0) statusFlag = statusFlag + 1
@@ -173,11 +171,18 @@ export default {
             }
           }
           if (statusFlag === v.nodes.length) v.status = '运行中'
-          if (statusFlag && statusFlag < v.nodes.length ) v.status = '部分运行中'
+          if (statusFlag && statusFlag < v.nodes.length) v.status = '部分运行'
           if (statusFlag === 0) v.status = '已关闭'
+          if (this.listQuery.status && this.listQuery.status !== v.status) return false
           return v
         })
         this.total = response.data.count
+        this.listLoading = false
+      }).catch(() => {
+        this.$message({
+          type: 'error',
+          message: '数据读取失败'
+        })
         this.listLoading = false
       })
     },
