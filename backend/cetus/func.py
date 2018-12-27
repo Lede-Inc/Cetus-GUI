@@ -300,7 +300,9 @@ class SaltClient(object):
                                      '-r {cetus_route} '
                                      '-p {dir}'.format(**kwargs))
 
-        create_task('node_%s_monitor' % kwargs.get('id'), 'cetus_monitor', [kwargs.get('id')])
+        create_task('node_%s_monitor' % kwargs.get('node_id'),
+                    'cetus_monitor',
+                    [kwargs.get('node_id')])
 
         if code == 0:
             logger.info(res)

@@ -38,11 +38,14 @@ def install_cetus(**kwargs):
 
     try:
         for node in kwargs.get('nodes'):
-            kwargs.update(salt_id=node.get('salt_id'))
+            node_id = TbCetusNodeInfo.objects.get(salt_id=node.get('salt_id'),
+                                                  service_port=kwargs.get('service_port')).id
+            kwargs.update(node_id=node_id,
+                          salt_id=node.get('salt_id'))
             kwargs.update(record_version=SaltClient.download_cetus_node(**kwargs))
 
             kwargs.update(dir='{path}/cetus_{service_port}/{record_version}'.format(**kwargs))
-            TbCetusNodeInfo.objects.filter(group_id=kwargs.get('id')) \
+            TbCetusNodeInfo.objects.filter(pk=node_id) \
                 .update(version=kwargs.get('record_version'), dir=kwargs.get('dir'))
 
             SaltClient.install_cetus_node(**kwargs)
@@ -81,6 +84,7 @@ def install_node(**kwargs):
     logger.info(kwargs)
     cetus_info = TbCetusGroupInfo.objects.get(pk=kwargs['group'])
     kwargs.update(id=kwargs['id'],
+                  node_id=kwargs['id'],
                   cetus_type=cetus_info.cetus_type,
                   config_db=cetus_info.config_db,
                   cetus_url=CETUS_URL,
@@ -124,12 +128,12 @@ def upgrade_node(**kwargs):
 
     try:
         SaltClient.operate_cetus_node(kwargs.get('id'), 'abort')
-        TbCetusNodeInfo.objects.filter(pk=kwargs['id']).update(status=2)
+        TbCetusNodeInfo.objects.filter(pk=kwargs.get('id')).update(status=2)
 
         kwargs.update(version=SaltClient.download_cetus_node(**kwargs))
         kwargs.update(dir=node_info.dir[:node_info.dir.rfind('/') + 1] + kwargs['version'])
 
-        SaltClient.install_cetus_node(**kwargs)
+        SaltClient.install_cetus_node(node_id=kwargs.get('id'), **kwargs)
 
         TbCetusNodeInfo.objects.filter(pk=kwargs.get('id')) \
             .update(version=kwargs.get('version'), dir=kwargs.get('dir'))
