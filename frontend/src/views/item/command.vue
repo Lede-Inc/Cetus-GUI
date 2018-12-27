@@ -12,6 +12,7 @@
         </el-col>
         <el-col :span="1" class="text-center">&nbsp;</el-col>
         <el-col :span="2" class="text-center">
+          <el-button type="info" size="small" class="bottom-button" style="margin: 0 0 50px 10px" @click="results='>>>\n'">清屏</el-button>
           <el-button type="primary" size="small" class="bottom-button" @click="sendCommand('nodeGroup', 'commandArea')">执行</el-button>
         </el-col>
       </el-row>
@@ -61,15 +62,18 @@ export default {
         if (n.isChecked) { node_group.push(n.value) }
       })
       if (node_group.length && this.$refs[item].value) {
+        const loading = this.$loading({ background: 'rgba(255, 255, 255, 0)' })
         manageCetus(this.id, {
           'commands': this.$refs[item].value,
           'nodes': node_group
         }).then(response => {
+          loading.close()
           for (const i of response.data) {
             this.results += i
           }
           this.results += '\n\n'
         }).catch(() => {
+          loading.close()
           this.$message({
             type: 'error',
             message: '后台执行出现错误，请查看日志'
