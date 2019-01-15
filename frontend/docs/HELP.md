@@ -55,7 +55,7 @@
       
       file_roots:
         base:
-         $PATH/backend/shells    # $PATH指项目所在路径
+         - $PATH/backend/shells    # $PATH指项目所在路径
     ```
     
     * 启动
