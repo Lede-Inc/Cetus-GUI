@@ -1,4 +1,4 @@
-# Cetus-GUI 帮助文档
+## Cetus-GUI 帮助文档
 
 ---
 
@@ -8,19 +8,113 @@
 
 ---
 
-### 环境部署
+### 基础环境配置
 
 ---
 
-#### 基础环境配置
-
-**所有与项目相关节点**确保有Python3环境，其中主节点兼容Python2环境以支持Supervisor。
+**所有与项目相关节点**确保有Python3环境。
 
 **所有节点**确保执行下列命令：
 
 * sudo yum install gcc gcc-c++ python3-devel python3-pip git
 * sudo pip3 install pymysql
 
+---
+
+### docker部署
+
+---
+
+此处是docker方式部署的配置方法，适用于简单配置Cetus-GUI环境的方式，源码安装请见源码部署一节。
+
+#### docker安装
+
+```
+  # sudo yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine
+  # sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+  # sudo yum-config-manager --add-repo https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
+  # sudo yum makecache fast
+  # sudo yum install docker-ce
+  # sudo pip install -U docker-compose
+```
+
+#### 镜像部署
+
+部署服务器的3306/4505/4506/8300/9527端口请务必不要占用！
+
+```
+  # git clone https://github.com/Lede-Inc/Cetus-GUI
+  # cd Cetus-GUI/backend/install
+  # docker-compose up -d
+```
+
+#### SaltStack安装
+
+docker节点已经默认安装了salt-master，此处只需安装Minion节点即可，docker节点所在服务器也可以配置为Minion。
+
+* 安装
+    
+``` 
+    # sudo yum install https://repo.saltstack.com/py3/redhat/salt-py3-repo-latest-2.el7.noarch.rpm
+    # sudo yum clean expire-cache
+    # sudo yum install salt-minion
+```
+    
+* 配置
+
+```
+    # sudo vi /etc/salt/minion
+  
+    master: Master节点ip，此处填写docker节点所在宿主机的ip即可
+    id: Minion唯一标识
+```
+
+* 启动
+
+```
+    # sudo service salt-minion start
+```
+
+* 测试
+
+  在镜像内部执行，测试Minion是否配置成功。
+
+```
+    # salt-key -A -y
+    # salt-key -L
+    # salt '*' test.ping 
+```
+
+#### 网络配置
+
+由于网络配置原因，需要修改部分配置信息。
+
+为简化说明，我们假设镜像所在节点ip为10.0.0.1，Minion id为Minion1。待安装Cetus节点ip为10.0.0.2，Minion id为Minion2。
+
+* 镜像内部执行
+
+```
+    # echo '10.0.0.1 Minion1' >> vi /etc/hosts
+    # echo '10.0.0.2 Minion2' >> vi /etc/hosts
+```
+
+* 所有Minion节点执行
+
+```
+    # echo '10.0.0.1 cetus_gui_db' >> vi /etc/hosts
+```
+
+#### 登陆
+
+http://localhost:9527
+
+---
+
+### 源码部署
+
+---
+
+源码部署适合于对项目进行大规模修改的情况，docker方式部署请跳过这一段。
 
 #### SaltStack安装
 
@@ -97,17 +191,50 @@
     
     pip3 install salt
 
----
-
-### 项目部署
-
----
-
-**本项目当前仅适用于RedHat/CentOS系统在SaltStack环境下使用远程配置库安装配置多Cetus节点的需求。**
+#### 部署环境
 
 部署环境上至少需要Python2和Python3双版本，需要**至少一个MySQL实例来放置项目数据库和Cetus配置数据库**。
 
-**项目的配置方式详见README。**
+```
+    git clone https://github.com/Lede-Inc/Cetus-GUI
+    cd Cetus-GUI
+    
+    修改如下配置：
+    
+    # Salt默认配置文件
+    vi /etc/salt/master
+    file_roots:
+      base:
+        - $PROJECT_PATH/Cetus-GUI/backend/shells
+    
+    # 修改Django配置文件
+    vi backend/backend/settings.py
+    DATABASES = {
+        # 默认数据库，存放项目和Cetus信息
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'xxx',
+            'USER': 'xxx',
+            'PASSWORD': 'xxx',
+            'HOST': 'xxx',
+            'PORT': xxx,
+        },
+        # 存放Cetus远程配置库信息，可与默认数据库一致
+        'catalog': {
+            'user': 'xxx',
+            'password': 'xxx',
+            'host': 'xxx',
+            'port': xxx,
+        }
+    }
+    # Cetus源代码路径
+    CETUS_URL = 'https://github.com/Lede-Inc/cetus'
+    # RabbitMQ配置端口
+    BROKER_URL = 'amqp://guest@localhost:5672//'
+    
+    修改后执行：
+    sh deploy.sh
+```
 
 以下是出现问题时可能的解决方案：
 
@@ -146,88 +273,6 @@
     
 ---
 
-### 使用说明
-
----
-
-* 登陆
-
-    * 项目启动后，直接访问http://localhost:9528登陆系统。
-    * 默认用户名与密码为admin/admin，可在Django端新增用户。
-    
-* 安装Cetus
-
-    ![cetus_install](./img/cetus_install.png)
-    
-    可以在SaltStack环境下的Minion节点安装Cetus，通过安装多节点可以配置Cetus端的负载均衡。
-    
-    提交安装请求后，若安装失败将在任务列表中显示对应log信息。
-    
-* Cetus列表
-
-    ![cetus_list](./img/cetus_list.png)
-    
-    显示所有Cetus运行或安装中的状态，点击查看可以查看Cetus详细信息，点击编辑可以修改Cetus基本信息。
-
-* Cetus详情
-
-    ![cetus_info](./img/cetus_info.png)
-    
-    支持Cetus信息状态查询，节点的启动、关闭、更新、删除、新增等操作。
-
-* Cetus配置
-
-    ![cetus_config](./img/cetus_config.png)
-    
-    支持Cetus基础参数的修改，用户与变量信息修改，分片信息修改，重启、更新、删除全部节点等功能。
-    
-    * 基础参数修改
-    
-        ![cetus_fund_params](./img/cetus_fund_params.png)
-        
-        注意字体加粗的为静态参数，需要手动重启Cetus客户端才能生效。
-    
-    * 用户和变量信息修改
-    
-        ![cetus_user](./img/cetus_user.png)
-        
-        其中用户名在Cetus端和MySQL端是一致的。密码分为客户端密码和服务端密码两种。
-        客户端密码为客户端连接Cetus时的密码，服务端密码为Cetus端连接数据库的密码，两者可以不同。
-        新增用户后也需要重启Cetus客户端来使信息生效。
-        
-    * 分片信息修改
-    
-        ![cetus_vdb](./img/cetus_vdb.png)
-        
-        分片信息可在Cetus为分片版本时修改，具体的配置方式请参考https://github.com/Lede-Inc/cetus/blob/master/doc/cetus-shard-profile.md。
-        
-* Cetus管理命令
-
-    ![cetus_command](./img/cetus_command.png)
-    
-    支持直接在web端执行命令发送到Cetus管理端。
-    
-    具体支持的命令请参考：
-    
-    * 读写分离版：https://github.com/Lede-Inc/cetus/blob/master/doc/cetus-rw-admin.md
-    * 分片版：https://github.com/Lede-Inc/cetus/blob/master/doc/cetus-shard-admin.md
-
-* Cetus监控
-
-    ![cetus_monitor](./img/cetus_monitor.png)
-    
-    Cetus在默认安装完成后会自动部署脚本，每分钟收集一次监控信息。系统默认收集了backends信息，连接数信息，TPS/QPS信息等内容。
-
-* 任务执行查询
-
-    由于Master与Minion节点系统环境的不确定性，安装Cetus时会因各种情况报错，我们可以在任务列表中查看失败的任务。
-
-    ![cetus_task](./img/cetus_task.png)
-    
-    我们也可以直接查询应用日志定位问题，如果日志中的信息无法帮你准备定位并解决问题，请联系我们。
-    
----
-
 ### 日志管理
 
 ---
@@ -239,7 +284,7 @@
 * 应用日志
 
 ```
-    cd $PATH/logs               # $PATH指项目所在路径   
+    cd $PATH/logs               # $PATH指项目所在路径(docker的路径为/app)
     supervisor_backend.log      # Django日志  
     supervisor_beat.log          
     supervisor_celerycam.log    
