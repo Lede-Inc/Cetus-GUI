@@ -9,8 +9,8 @@
         <div class="rows">
           <el-col :span="3" class="text-center">节点{{ index + 1 }}</el-col>
           <el-col :span="7" class="text-center">SALT ID：{{ node.salt_id }}</el-col>
-          <el-col :span="7" class="text-center">管理端口：{{ node.service_port }}</el-col>
-          <el-col :span="7" class="text-center">服务端口：{{ node.admin_port }}</el-col>
+          <el-col :span="7" class="text-center">服务端口：{{ node.service_port }}</el-col>
+          <el-col :span="7" class="text-center">管理端口：{{ node.admin_port }}</el-col>
         </div>
         <div class="rows">
           <el-col :span="3" class="text-center">&nbsp;</el-col>

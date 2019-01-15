@@ -4,12 +4,15 @@ from rest_framework.response import Response
 
 import ast
 from celery import signature
+import logging
 
 from .serializers import CetusGroupSerializer, CetusNodeSerializer
 from .models import TbCetusGroupInfo, TbCetusNodeInfo
 from .tasks import remove_node, remove_cetus
 from .func import CetusConn, convert_command_results
 from backend.settings import DATABASES
+
+logger = logging.getLogger('django')
 
 
 class CetusViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
@@ -104,12 +107,15 @@ class CetusViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Update
                                    cursor='dict',
                                    **DATABASES['catalog']) \
                 .get_remote_db_args(['admin-username', 'admin-password'])
-            for item in TbCetusNodeInfo.objects.filter(group_id=pk):
-                conn = CetusConn(host=item.salt_id,
-                                 port=item.admin_port,
-                                 user=admin_info['admin-username'],
-                                 password=admin_info['admin-password'])
-                conn.execute('config reload')
+            try:
+                for item in TbCetusNodeInfo.objects.filter(group_id=pk):
+                    conn = CetusConn(host=item.salt_id,
+                                     port=item.admin_port,
+                                     user=admin_info['admin-username'],
+                                     password=admin_info['admin-password'])
+                    conn.execute('config reload')
+            except Exception as e:
+                logger.error('Cetus Not Start')
 
         return Response(res, status=status.HTTP_200_OK)
 
