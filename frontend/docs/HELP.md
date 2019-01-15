@@ -270,6 +270,10 @@ http://localhost:9527
     ```
     
     若有进程的状态非RUNNING，请查看deploy.sh的执行日志情况。
+
+#### 登陆
+
+http://localhost:9528
     
 ---
 
