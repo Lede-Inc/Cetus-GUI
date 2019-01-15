@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  cetus_gui_db:
+    container_name: cetus_gui_db
+    image: mysql:5.7
+    volumes:
+      - ./mysql/:/etc/mysql/conf.d/
+      - ./data/:/var/lib/mysql/
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: cetus_password
+      MYSQL_DATABASE: cetus_gui
+      MYSQL_USER: cetus
+      MYSQL_PASSWORD: cetus
+  cetus_gui_app:
+    container_name: cetus_gui_app
+    image: hub.c.163.com/mikuru333/cetus-gui:v0.0.1
+    restart: always
+    depends_on:
+      - cetus_gui_db
+    ports:
+      - "9527:80"
+      - "8300:8000"
+      - "4505:4505"
+      - "4506:4506"
+    stdin_open: true
+    tty: true
