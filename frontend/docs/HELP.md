@@ -166,7 +166,7 @@ http://localhost:9527
     ```
     
     * 启动
-        * sudo service salt-master start
+        * sudo service salt-minion start
         
 * 非root用户启动
 
@@ -180,7 +180,7 @@ http://localhost:9527
       # 修改权限
       # sudo chown -R user:user /etc/salt /var/cache/salt /var/log/salt /var/run/salt
       
-      # sudo service salt-minion restart
+      # sudo service salt-master restart
     ```
     
     Minion节点不需要修改，这样可以使发送到Minion的命令仍为root执行。
