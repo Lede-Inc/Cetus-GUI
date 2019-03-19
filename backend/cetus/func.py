@@ -357,7 +357,8 @@ class SaltClient(object):
             'operate_type': operate_type,
             'config_db': cetus_info.config_db,
             'cetus_route': node_info.dir,
-            'cetus_owner': 'cetus_%s' % node_info.service_port
+            'cetus_owner': 'cetus_%s' % node_info.service_port,
+            'admin_port': node_info.admin_port
         }
 
         kwargs.update(**DATABASES['catalog'])
@@ -383,7 +384,8 @@ class SaltClient(object):
                                      '-p {password} '
                                      '-d {config_db} '
                                      '-r {cetus_route} '
-                                     '-o {cetus_owner}'.format(**kwargs))
+                                     '-o {cetus_owner} '
+                                     '-a {admin_port}'.format(**kwargs))
 
         logger.info((code, res))
 

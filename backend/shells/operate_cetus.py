@@ -60,13 +60,21 @@ def shutdown_cetus(**kwargs):
 
 def shutdown_abort_cetus(**kwargs):
     try:
-        cmd = "remote-conf-url.*" + kwargs.get('database')
-        child = subprocess.Popen(['pgrep', '-f', cmd],
-                                 shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        out = child.communicate()[0]
-        pid_list = [int(pid) for pid in out.split()]
+        pid_path = '%s/%s.pid' % (kwargs.get('cetus_route')[:kwargs.get('cetus_route').rfind('/')],
+                                  kwargs.get('cetus_owner'))
+        if os.path.exists(pid_path):
+            with open(pid_path, 'r') as f:
+                pid_list = [int(f.read())]
+        else:
+            cmd = 'remote-conf-url.*' + kwargs.get('database')
+            child = subprocess.Popen(['pgrep', '-f', cmd],
+                                     shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            out = child.communicate()[0]
+            pid_list = [int(pid) for pid in out.split()]
         for item in pid_list:
             os.kill(item, signal.SIGKILL)
+        tmp_path = '/tmp/0.0.0.0:' + kwargs.get('admin_port')
+        os.remove(tmp_path) if os.path.exists(tmp_path) else None
         return 0, 'success'
     except Exception as e:
         return 1, e
@@ -80,8 +88,8 @@ def restart_cetus(**kwargs):
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                   't:h:P:u:p:d:r:o:',
-                                   ['help', 'type=', 'host=', 'port=', 'user=', 'passwd=', 'database=', 'route=', 'owner='])
+                                   't:h:P:u:p:d:r:o:a:',
+                                   ['help', 'type=', 'host=', 'port=', 'user=', 'passwd=', 'database=', 'route=', 'owner=', 'admin='])
 
     except getopt.GetoptError as err:
         print(err)
@@ -106,6 +114,8 @@ def main():
             cetus_route = arg
         elif opt in ('-o', '--owner'):
             cetus_owner = arg
+        elif opt in ('-a', '--admin'):
+            admin_port = arg
 
     if operate_type == 'start':
         res = start_cetus(**locals())
