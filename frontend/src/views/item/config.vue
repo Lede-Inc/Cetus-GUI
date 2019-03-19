@@ -272,7 +272,7 @@
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column label="主键key名">
+              <el-table-column label="分片键名">
                 <template slot-scope="scope">
                   <div v-if="!scope.row.editing">
                     <span>{{ scope.row.pkey }}</span>
