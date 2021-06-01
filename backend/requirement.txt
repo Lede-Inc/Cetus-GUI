@@ -8,5 +8,5 @@ djangorestframework-filter==0.2.2
 djangorestframework-jwt==1.11.0
 PyMySQL==0.9.2
 salt==2018.3.3
-urllib3==1.23
+urllib3==1.26.5
 uWSGI==2.0.17.1
